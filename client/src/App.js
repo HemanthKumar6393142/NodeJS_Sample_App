@@ -12,7 +12,7 @@ function App() {
   return (
     <div style={{ textAlign: 'center', marginTop: '3rem' }}>
       <h1>React + Node.js Sample App</h1>
-      <p>Message from server:</p>
+      <p>Message from Hemanth server:</p>
       <h2>{message}</h2>
     </div>
   );
