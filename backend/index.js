@@ -10,7 +10,7 @@ app.use(express.json());
 
 // API route
 app.get('/api/message', (req, res) => {
-  res.json({ message: 'Hello from the standalone backend!' });
+  res.json({ message: 'Hello from the Hemanth standalone backend!' });
 });
 
 app.listen(PORT, () => {
