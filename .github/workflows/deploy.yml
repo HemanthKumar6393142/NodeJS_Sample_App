@@ -8,6 +8,7 @@ jobs:
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
+    environment: production  # 🔐 Enables environment-specific secrets
 
     steps:
       - name: 📥 Checkout code
