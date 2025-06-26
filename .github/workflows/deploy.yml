@@ -1,0 +1,63 @@
+name: Deploy Fullstack App to Single Server
+
+on:
+  push:
+    branches: [main]  # Change to your branch
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # ====================
+      # Build Frontend
+      # ====================
+      - name: 🔧 Install & Build Frontend
+        working-directory: ./client
+        run: |
+          npm install
+          npm run build
+
+      # ====================
+      # Setup SSH
+      # ====================
+      - name: 🔐 Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      # ====================
+      # Deploy Frontend
+      # ====================
+      - name: 🚀 Deploy Frontend
+        run: |
+          rsync -avz --delete ./client/build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/html
+
+      # ====================
+      # Deploy Backend
+      # ====================
+      - name: 📦 Deploy Backend
+        run: |
+          rsync -avz --delete ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend
+
+      # ====================
+      # Restart Backend with PM2
+      # ====================
+      - name: ♻️ Restart Backend
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            cd /home/${{ secrets.SERVER_USER }}/backend
+            npm install
+            pm2 restart index.js || pm2 start index.js --name backend-app
+          EOF
