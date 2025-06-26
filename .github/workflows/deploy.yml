@@ -41,9 +41,13 @@ jobs:
       # ====================
       # Deploy Frontend
       # ====================
-      - name: 🚀 Deploy Frontend
+      - name: 🚀 Deploy Frontend as Non-root
         run: |
-          rsync -avz --delete ./client/build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/html
+          rsync -avz --delete ./client/build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/frontend-build/
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            sudo rm -rf /var/www/html/*
+            sudo cp -r /tmp/frontend-build/* /var/www/html/
+          EFO
 
       # ====================
       # Deploy Backend
