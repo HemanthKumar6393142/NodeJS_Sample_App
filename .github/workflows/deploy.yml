@@ -3,6 +3,7 @@ name: Deploy Fullstack App to Single Server
 on:
   push:
     branches: [main]  # Change to your branch
+  workflow_dispatch:
 
 jobs:
   deploy:
