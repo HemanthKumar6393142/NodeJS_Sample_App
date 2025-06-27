@@ -44,10 +44,10 @@ jobs:
       # ====================
       - name: 🚀 Deploy Frontend as Non-root
         run: |
-          rsync -avz --delete ./client/build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/frontend-build/
+          rsync -avz --delete ./client/build/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/frontend/
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             sudo rm -rf /var/www/html/*
-            sudo cp -r /tmp/frontend-build/* /var/www/html/
+            sudo cp -r /home/${{ secrets.SERVER_USER }}/frontend/* /var/www/html/
           EOF
 
       # ====================
@@ -55,7 +55,7 @@ jobs:
       # ====================
       - name: 📦 Deploy Backend
         run: |
-          rsync -avz --delete ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend
+          rsync -avz --delete ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend/
 
       # ====================
       # Restart Backend with PM2
@@ -64,6 +64,6 @@ jobs:
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             cd /home/${{ secrets.SERVER_USER }}/backend
-            npm install
-            pm2 restart index.js || pm2 start index.js --name backend-app
+            sudo npm install
+            sudo pm2 restart index.js || sudo pm2 start index.js --name backend-app
           EOF
